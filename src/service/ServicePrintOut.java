@@ -136,8 +136,8 @@ public class ServicePrintOut {
             System.out.println("Анализ месяца " + Month.values()[key - 1].getTitle());
             monthlyReport = getMonthlyReports().get(key);
 
-            String[] resultsProfit = lookForProfitGoods(monthlyReport, false);
-            String[] resultWaste = lookForProfitGoods(monthlyReport, true);
+            String[] resultsProfit = lookForExpenseOrProfitGoods(monthlyReport, false);
+            String[] resultWaste = lookForExpenseOrProfitGoods(monthlyReport, true);
 
             System.out.println("Самый прибыльный товар - " + resultsProfit[0] +
                     "\nСумма товара - " + resultsProfit[1] + "\n");
@@ -170,11 +170,17 @@ public class ServicePrintOut {
             difference = profit - waste;
             printProfit(month, difference);
         }
-        printAverageExpense(getYearlyReport(), false);
-        printAverageExpense(getYearlyReport(), true);
+        printAverageExpenseOrProfit(getYearlyReport(), false);
+        printAverageExpenseOrProfit(getYearlyReport(), true);
     }
 
-    public String[] lookForProfitGoods(MonthlyReport monthlyReport, boolean isPoint) {
+    /**
+     *Я пока оставил массив String, не стал переписывать на класс, но взял на заметку.
+     * И на счет регулярных выражений тоже, да и модели классов. В этой работе не стал менять,
+     * хотя начал делать этот проект в другом окне с твоими советами.
+     */
+    public String[] lookForExpenseOrProfitGoods(MonthlyReport monthlyReport,
+                                                boolean isExpenseOrProfit) {
         int product, maxProduct = 0;
         String[] array = new String[2];
 
@@ -184,7 +190,7 @@ public class ServicePrintOut {
             int quantity = monthlyReport.getQuantity().get(i);
             int sumOfOne = monthlyReport.getSumOfOne().get(i);
 
-            if (isExpense == isPoint) {
+            if (isExpense == isExpenseOrProfit) {
                 product = quantity * sumOfOne;
                 if (maxProduct < product) {
                     maxProduct = product;
@@ -202,19 +208,21 @@ public class ServicePrintOut {
                 " сотавила - " + difference);
     }
 
-    public void printAverageExpense(YearlyReport yearlyReport, boolean isPoint) {
-        int result = lookForAverageExpense(yearlyReport, isPoint);
+    public void printAverageExpenseOrProfit(YearlyReport yearlyReport,
+                                            boolean isExpenseOrProfit) {
+        int result = lookForAverageExpense(yearlyReport, isExpenseOrProfit);
 
-        System.out.println("Средний " + (isPoint ? "расход" : "доход")
+        System.out.println("Средний " + (isExpenseOrProfit ? "расход" : "доход")
                 + " за " + getUserYear() + "г." +
                 " составил - " + result);
     }
 
-    public int lookForAverageExpense(YearlyReport yearlyReport, boolean isPoint) {
+    public int lookForAverageExpense(YearlyReport yearlyReport,
+                                     boolean isExpenseOrProfit) {
         int sumWaste = 0;
 
         for (int i = 0; i < yearlyReport.length(); i++) {
-            if (isPoint == yearlyReport.getIsExpense().get(i)) {
+            if (isExpenseOrProfit == yearlyReport.getIsExpense().get(i)) {
                 sumWaste += yearlyReport.getAmount().get(i);
             }
         }

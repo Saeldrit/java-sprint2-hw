@@ -49,7 +49,7 @@ public class Repository {
                 contentOfFile.add(line);
             }
         } catch (IOException e) {
-            throw new NullPointerException(e.getMessage() + " where is your f*** file?");
+            throw new NullPointerException(e.getMessage() + "sir, where is your file?");
         }
 
         return contentOfFile;
