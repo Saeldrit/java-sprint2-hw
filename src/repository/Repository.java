@@ -12,8 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -70,23 +69,30 @@ public class Repository {
         return files;
     }
 
-    public List<MonthlyReport> readAllMonthlyReports(int userYear) {
-        List<MonthlyReport> monthlyReports = new ArrayList<>();
+    public Map<Integer, MonthlyReport> readAllMonthlyReports(int userYear) {
+        Map<Integer, MonthlyReport> monthlyReports = new LinkedHashMap<>();
         List<File> filesModMonths = getFilesByModifier(getFiles(), Modifier.MONTH.getTitle());
 
         for (var file : filesModMonths) {
             int fileYear;
             String path = file.getName();
+
             StringBuilder stringBuilder = new StringBuilder();
+            StringBuilder stringMonth = new StringBuilder();
 
             for (int i = 2; i < 6; i++) {
                 stringBuilder.append(path.charAt(i));
             }
 
+            for (int i = 6; i < 8; i++) {
+                stringMonth.append(path.charAt(i));
+            }
+
             fileYear = Integer.parseInt(stringBuilder.toString());
 
             if (userYear == fileYear) {
-                monthlyReports.add(getBuilder()
+                monthlyReports.put(Integer.parseInt(stringMonth.toString()),
+                        getBuilder()
                         .builderObjectMonthlyReport(
                                 readFileContents(getDirectory() + "/" +
                                         Modifier.MONTH.getTitle() + "." +
@@ -99,35 +105,12 @@ public class Repository {
         return monthlyReports;
     }
 
-    public MonthlyReport readMonthlyReport(int userYear, int month) {
+    public MonthlyReport lookForMonthlyReport(Map<Integer, MonthlyReport> reports, int month) {
         MonthlyReport monthlyReport = null;
-        List<File> months = getFilesByModifier(getFiles(), Modifier.MONTH.getTitle());
 
-        for (var file : months) {
-            int fileYear, fileMonth;
-            String path = file.getName();
-            StringBuilder stringYear = new StringBuilder();
-            StringBuilder stringMonth = new StringBuilder();
-
-            for (int i = 2; i < 6; i++) {
-                stringYear.append(path.charAt(i));
-            }
-
-            for (int i = 6; i < 8; i++) {
-                stringMonth.append(path.charAt(i));
-            }
-
-            fileYear = Integer.parseInt(stringYear.toString());
-            fileMonth = Integer.parseInt(stringMonth.toString());
-
-            if (userYear == fileYear && fileMonth == month) {
-                monthlyReport = getBuilder()
-                        .builderObjectMonthlyReport(
-                                readFileContents(getDirectory() + "/" +
-                                        Modifier.MONTH.getTitle() + "." +
-                                        fileYear + "" +
-                                        file.getName().charAt(6) +
-                                        "" + file.getName().charAt(7) + ".csv"));
+        for (var report : reports.keySet()) {
+            if (month == report) {
+                monthlyReport = reports.get(report);
                 break;
             }
         }

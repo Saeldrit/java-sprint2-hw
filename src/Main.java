@@ -1,4 +1,4 @@
-import controller.FrontendController;
+import controller.ConsoleController;
 
 /**
  * Консольный интерфейс по работе с программной должен позволять оператору произвести одно из пяти действий по выбору:
@@ -9,12 +9,12 @@ import controller.FrontendController;
  * 5 - Вывести информацию о годовом отчёте
  *
  * @author Alexey.Pavlovskiy
- * @version 1.0 от 21.07.2022
+ * @version 2.0 от 29.07.2022
  */
 
 public class Main {
     public static void main(String[] args) {
-        FrontendController controller = new FrontendController();
+        ConsoleController controller = new ConsoleController();
         controller.postConstruct();
     }
 }
